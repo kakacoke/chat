@@ -16,6 +16,9 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from apps.embedding.views import upload_pdf
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('upload/', upload_pdf, name='upload'),
 ]
