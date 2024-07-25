@@ -4,15 +4,9 @@ from django.db import models
 
 # Create your models here.类似实体层
 
-class PDFDocument(models.Model):
-    title = models.CharField(max_length=100)
-    pdf = models.FileField(upload_to='pdfs/')
+class PDFEmbedding(models.Model):
+    chunk = models.TextField()
+    vector = models.JSONField()
 
     def __str__(self):
-        return self.title
-
-
-class PDFUploadForm(forms.ModelForm):
-    class Meta:
-        model = PDFDocument
-        fields = ['title', 'pdf']
+        return self.chunk[:50]
