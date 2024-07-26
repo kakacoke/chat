@@ -1,7 +1,6 @@
 import fitz
 from django.http import HttpResponse
 from django.shortcuts import render
-from langchain.chains import PDFTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 
 from apps.embedding.models import PDFEmbedding
@@ -9,6 +8,7 @@ from apps.embedding.models import PDFEmbedding
 
 # Create your views here.类似services和dao
 
+# 读取并分块处理pdf
 def split_pdf_to_chunks(file_path, chunk_size=512):
     doc = fitz.open(file_path)
     text = ""
@@ -21,12 +21,14 @@ def split_pdf_to_chunks(file_path, chunk_size=512):
     return chunks
 
 
+# 指定模型向量化处理文本块
 def vectorize_chunks(chunks):
-    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")  # 替换为您的模型
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
     vectors = [embeddings.embed(chunk) for chunk in chunks]
     return vectors
 
 
+# 存储向量到数据库
 def process_pdf_to_database(file_path):
     chunks = split_pdf_to_chunks(file_path)
     vectors = vectorize_chunks(chunks)
@@ -36,6 +38,7 @@ def process_pdf_to_database(file_path):
         embedding.save()
 
 
+# 上传pdf
 def upload_pdf(request):
     if request.method == 'POST':
         uploaded_file = request.FILES['document']
@@ -46,4 +49,4 @@ def upload_pdf(request):
         process_pdf_to_database('temp.pdf')
         return HttpResponse("PDF processed and saved to database.")
 
-    return render(request, 'upload.html', {'form': form})
+    return render(request, 'upload.html')
